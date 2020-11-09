@@ -1,0 +1,75 @@
+系统原理：linux
+ VFS FD
+ pagecache
+
+ 文件系统的IO
+ 内存和IO关系
+ 网络IO
+
+
+冯诺依曼：
+    计算器，控制器
+    主存储器
+    输入输出设备
+
+   抽象成一切皆文件   -->  I/O
+
+ 系统： CPU 内存 IO （磁盘、网卡）
+
+ 内存： kernel
+       VFS树
+       FD 文件描述符
+       inode id 相当于文件路径的编号
+       pagecache 4k(缓存)
+       dirty 脏
+       flush
+
+       内核态：kernel  什么都管 VFS 树  inode: id -->访问内核，内核将数据读到内存中，pagecache 4k
+       用户态：application
+
+        目录树结构是趋于稳定 有一个映射过程  ->  文件类型  ->  -:普通文件（可执行的，图片，文本）
+                                                       d:目录
+                                                       b:块设备
+                                                       c:字符设备
+                                                       l:链接
+                                                       s:socket
+                                                       p:pipeline
+                                                       [eventpoll]:
+
+    硬链接：指向同一个物理位置
+    软连接：引用相同，Inode 不同 地址不同
+
+    dd if=/dev/zero  of=mydisk.img bs=1048576 count=100
+
+    ll -h
+    losetup /dev/loop0 mydisk.img
+    mke2fs /dev/loop0
+    ldd 动态链接库
+
+    挂载 mount -t exts /dev/loop0 /mnt/ooxx
+
+    bash 是解释程序
+
+linux命令：
+    df: 挂载目录  -h
+
+    lsof -p 当前bash 查看bash命令
+
+    任何程序都有：
+        0：标准输入
+        1：标准输出
+        2：报错输出
+
+        IO
+        < 输入
+        > 输出
+
+    读取文件内容：
+        head -1  xxx.txt
+        tail -2  xxx.txt
+
+    application : buffer
+
+    int 0x80 cpu的指令
+        该值是放在寄存器当中，中断描述符表  0 1 2 128（对应callback方法） 255
+        保护现场，切换用户态
