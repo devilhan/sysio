@@ -34,7 +34,7 @@ public class SocketIOPropertites {
     private static final boolean CLI_LINGER = true;
     private static final int CLI_LINGER_N = 0;
     private static final int CLI_TIMEOUT = 0;
-    private static final boolean CLI_NO_DELAY = false;
+    private static final boolean CLI_NO_DELAY = false; //不优化
 /*
 
     StandardSocketOptions.TCP_NODELAY

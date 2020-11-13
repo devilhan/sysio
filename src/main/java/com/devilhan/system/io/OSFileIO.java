@@ -12,7 +12,7 @@ import java.nio.channels.FileChannel;
 public class OSFileIO {
 
     static byte[] data = "123456789\n".getBytes();
-    static String path =  "/root/testfileio/out.txt";
+    static String path =  "D:/testfileio/out.txt";
 
 
     public static void main(String[] args) throws Exception {
@@ -50,6 +50,8 @@ public class OSFileIO {
 
     //测试buffer文件IO
     //  jvm  8kB   syscall  write(8KBbyte[])
+
+    //应用了缓冲来减少IO的调用次数
 
     public static void testBufferedFileIO() throws Exception {
         File file = new File(path);
@@ -142,12 +144,12 @@ public class OSFileIO {
         System.out.println("-------------flip......");
         System.out.println("mark: " + buffer);
 
-        buffer.get();
+        buffer.get();  //获取  读的时候
 
         System.out.println("-------------get......");
         System.out.println("mark: " + buffer);
 
-        buffer.compact();
+        buffer.compact();  //挤压  写的时候
 
         System.out.println("-------------compact......");
         System.out.println("mark: " + buffer);
