@@ -15,8 +15,8 @@ import java.util.concurrent.Executors;
  * @author Hanyanjiao
  * @date 2020/10/21
  */
-public class PoolServer{
-    ExecutorService pool = Executors.newFixedThreadPool(50);
+public class PoolServer {
+    ExecutorService pool = Executors.newFixedThreadPool(2);
 
     private Selector selector;
 
@@ -28,22 +28,20 @@ public class PoolServer{
 
     private void listen() throws IOException {
         //轮询访问selector
-
         while (true) {
-
             selector.select();
             Iterator ite = this.selector.selectedKeys().iterator();
-            while (ite.hasNext()){
+            while (ite.hasNext()) {
                 SelectionKey key = (SelectionKey) ite.next();
                 ite.remove();
                 if (key.isAcceptable()) {
-
                     ServerSocketChannel server = (ServerSocketChannel) key.channel(); //全双工
                     SocketChannel channel = server.accept();
                     channel.configureBlocking(false);
-                    channel.register(this.selector,SelectionKey.OP_ACCEPT);
-                }else if (key.isReadable()){
-                    key.interestOps(key.interestOps()&(~SelectionKey.OP_READ));
+                    channel.register(selector, SelectionKey.OP_READ);
+                }
+                if (key.isReadable()) {
+                    key.interestOps(key.interestOps() & (~SelectionKey.OP_READ));
                     pool.execute(new ThreadHandlerChannel(key));
                 }
             }
@@ -57,12 +55,10 @@ public class PoolServer{
 
         serverChannel.socket().bind(new InetSocketAddress(port));
 
-        this.selector =  Selector.open();
+        this.selector = Selector.open();
 
-        serverChannel.register(selector,SelectionKey.OP_ACCEPT);
+        serverChannel.register(selector, SelectionKey.OP_ACCEPT);
 
         System.out.println("服务端启动成功！");
     }
-
-
 }

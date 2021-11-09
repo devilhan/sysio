@@ -7,17 +7,13 @@ import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.StandardSocketOptions;
 
 /**
- * @author: han
+ * @author: 马士兵教育
  * @create: 2020-05-17 05:34
  * BIO  多线程的方式
- *
- *
  */
 public class SocketIOPropertites {
-
 
 
     //server socket listen property:
@@ -34,7 +30,7 @@ public class SocketIOPropertites {
     private static final boolean CLI_LINGER = true;
     private static final int CLI_LINGER_N = 0;
     private static final int CLI_TIMEOUT = 0;
-    private static final boolean CLI_NO_DELAY = false; //不优化
+    private static final boolean CLI_NO_DELAY = false;
 /*
 
     StandardSocketOptions.TCP_NODELAY
@@ -52,7 +48,7 @@ public class SocketIOPropertites {
         ServerSocket server = null;
         try {
             server = new ServerSocket();
-            server.bind(new InetSocketAddress( 9090), BACK_LOG);
+            server.bind(new InetSocketAddress(9090), BACK_LOG);
             server.setReceiveBufferSize(RECEIVE_BUFFER);
             server.setReuseAddress(REUSE_ADDR);
             server.setSoTimeout(SO_TIMEOUT);
@@ -61,11 +57,12 @@ public class SocketIOPropertites {
             e.printStackTrace();
         }
         System.out.println("server up use 9090!");
-        while (true) {
-            try {
-                System.in.read();  //分水岭：
+        try {
+            while (true) {
 
-                Socket client = server.accept();
+                // System.in.read();  //分水岭：
+
+                Socket client = server.accept();  //阻塞的，没有 -1  一直卡着不动  accept(4,
                 System.out.println("client port: " + client.getPort());
 
                 client.setKeepAlive(CLI_KEEPALIVE);
@@ -77,13 +74,15 @@ public class SocketIOPropertites {
                 client.setSoTimeout(CLI_TIMEOUT);
                 client.setTcpNoDelay(CLI_NO_DELAY);
 
+                //client.read   //阻塞   没有  -1 0
                 new Thread(
                         () -> {
-                            while (true) {
-                                try {
-                                    InputStream in = client.getInputStream();
-                                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                                    char[] data = new char[1024];
+                            try {
+                                InputStream in = client.getInputStream();
+                                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                                char[] data = new char[1024];
+                                while (true) {
+
                                     int num = reader.read(data);
 
                                     if (num > 0) {
@@ -93,26 +92,29 @@ public class SocketIOPropertites {
                                         continue;
                                     } else {
                                         System.out.println("client readed -1...");
+                                        System.in.read();
                                         client.close();
                                         break;
                                     }
-
-                                } catch (IOException e) {
-                                    e.printStackTrace();
                                 }
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
                             }
+
                         }
                 ).start();
 
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                server.close();
             } catch (IOException e) {
                 e.printStackTrace();
-            }finally {
-                try {
-                    server.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             }
         }
+
     }
 }

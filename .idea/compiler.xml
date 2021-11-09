@@ -7,8 +7,9 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="bjmashbing-sysio" />
         <module name="devil-sysio" />
+        <module name="sysio" />
+        <module name="bjmashbing-sysio" />
       </profile>
     </annotationProcessing>
   </component>

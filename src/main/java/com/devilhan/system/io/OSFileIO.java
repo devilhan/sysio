@@ -1,6 +1,7 @@
 package com.devilhan.system.io;
 
 import org.junit.Test;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -12,7 +13,7 @@ import java.nio.channels.FileChannel;
 public class OSFileIO {
 
     static byte[] data = "123456789\n".getBytes();
-    static String path =  "D:/testfileio/out.txt";
+    static String path =  "/root/testfileio/out.txt";
 
 
     public static void main(String[] args) throws Exception {
@@ -51,8 +52,6 @@ public class OSFileIO {
     //测试buffer文件IO
     //  jvm  8kB   syscall  write(8KBbyte[])
 
-    //应用了缓冲来减少IO的调用次数
-
     public static void testBufferedFileIO() throws Exception {
         File file = new File(path);
         BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
@@ -86,6 +85,7 @@ public class OSFileIO {
         FileChannel rafchannel = raf.getChannel();
         //mmap  堆外  和文件映射的   byte  not  objtect
         MappedByteBuffer map = rafchannel.map(FileChannel.MapMode.READ_WRITE, 0, 4096);
+
 
         map.put("@@@".getBytes());  //不是系统调用  但是数据会到达 内核的pagecache
             //曾经我们是需要out.write()  这样的系统调用，才能让程序的data 进入内核的pagecache
@@ -144,12 +144,12 @@ public class OSFileIO {
         System.out.println("-------------flip......");
         System.out.println("mark: " + buffer);
 
-        buffer.get();  //获取  读的时候
+        buffer.get();
 
         System.out.println("-------------get......");
         System.out.println("mark: " + buffer);
 
-        buffer.compact();  //挤压  写的时候
+        buffer.compact();
 
         System.out.println("-------------compact......");
         System.out.println("mark: " + buffer);

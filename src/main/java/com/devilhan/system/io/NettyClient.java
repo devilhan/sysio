@@ -3,7 +3,6 @@ package com.devilhan.system.io;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -15,7 +14,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 
 
 /**
- * @author: han
+ * @author: devilhan
  * @create: 2020-04-26 15:59
  */
 public class NettyClient {
@@ -26,7 +25,7 @@ public class NettyClient {
             Bootstrap boot = new Bootstrap();
             boot.group(worker)
                     .channel(NioSocketChannel.class)
-                    .remoteAddress("localhost", 9090)
+                    .remoteAddress("192.168.150.11", 9090)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) throws Exception {

@@ -7,9 +7,6 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-/**
- * BIO
- */
 public class SocketIO {
 
 

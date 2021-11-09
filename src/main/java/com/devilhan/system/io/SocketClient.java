@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.Socket;
 
 /**
- * @author: han
+ * @author: 马士兵教育
  * @create: 2020-05-17 16:18
  */
 public class SocketClient {
@@ -12,7 +12,7 @@ public class SocketClient {
     public static void main(String[] args) {
 
         try {
-            Socket client = new Socket("192.168.92.1",9090);
+            Socket client = new Socket("192.168.150.11",9090);
 
             client.setSendBufferSize(20);
             client.setTcpNoDelay(true);

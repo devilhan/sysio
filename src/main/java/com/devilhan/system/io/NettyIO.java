@@ -7,13 +7,13 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
-
 public class NettyIO {
 
     public static void main(String[] args) {
 
         NioEventLoopGroup boss = new NioEventLoopGroup(2);
         NioEventLoopGroup worker = new NioEventLoopGroup(2);
+
         ServerBootstrap boot = new ServerBootstrap();
 
         try {
@@ -21,9 +21,13 @@ public class NettyIO {
                     .channel(NioServerSocketChannel.class)
                     .option(ChannelOption.TCP_NODELAY,false)
                     .childHandler(new ChannelInitializer<NioSocketChannel>() {
-                        @Override
+                            @Override
                         protected void initChannel(NioSocketChannel ch) throws Exception {
                             ChannelPipeline p = ch.pipeline();
+                            p.addLast(new MyInbound());
+                            p.addLast(new MyInbound());
+                            p.addLast(new MyInbound());
+                            p.addLast(new MyInbound());
                             p.addLast(new MyInbound());
 
                         }

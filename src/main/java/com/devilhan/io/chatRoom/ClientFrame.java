@@ -18,44 +18,51 @@ import java.awt.event.ActionListener;
  * @author Hanyanjiao
  * @date 2020/10/28
  */
-public class ClientFrame extends Frame { TextArea ta = new TextArea();
+public class ClientFrame extends Frame {
+    private static final String TITLE_NAME = "devilHan";
+    TextArea ta = new TextArea();
     TextField tf = new TextField();
 
     private Channel channel = null;
 
-    public ClientFrame(){
-        this.setSize(600,400);
-        this.setLocation(100,20);
-        this.add(ta,BorderLayout.CENTER);
-        this.add(tf,BorderLayout.SOUTH);
-        this.setTitle("小妖聊天室");
-        ta.setText("客户biu:");
-
+    public ClientFrame() {
+        this.setSize(600, 400);
+        this.setLocation(300, 30);
+        this.add(ta, BorderLayout.CENTER);
+        this.add(tf, BorderLayout.SOUTH);
+        ta.setEditable(false);
+        this.setTitle(TITLE_NAME);
 
         tf.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //将字符串发送到服务器
-               /* ta.setText(ta.getText()+ "\n" + tf.getText());
-                tf.setText("");*/
-               send(tf.getText());
-               tf.setText("");
+                if (tf.getText() != null && tf.getText() != "") {
+                    //将字符串发送到服务器
+                    String msg = TITLE_NAME + ":\n    " + tf.getText();
+                    if (ta.getText() != null && ta.getText() != "") {
+                        ta.setText(ta.getText() + "\n" + msg);
+                    } else {
+                        ta.setText(msg);
+                    }
+                    send(msg);
+                    tf.setText("");
+                }
             }
         });
         this.setVisible(true);
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         ClientFrame clientFrame = new ClientFrame();
         clientFrame.connect();
     }
 
-    public void send(String msg){
+    public void send(String msg) {
         ByteBuf buf = Unpooled.copiedBuffer(msg.getBytes());
         channel.writeAndFlush(buf);
     }
 
-    public void connect(){
+    public void connect() {
         EventLoopGroup client = new NioEventLoopGroup();
         Bootstrap b = new Bootstrap();
         b.group(client).channel(NioSocketChannel.class)
@@ -66,59 +73,55 @@ public class ClientFrame extends Frame { TextArea ta = new TextArea();
                     }
                 });
         try {
-            ChannelFuture f = b.connect("localhost",8888);
+            ChannelFuture f = b.connect("localhost", 8888);
             f.addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture channelFuture) throws Exception {
-                    if (!channelFuture.isSuccess()){
+                    if (!channelFuture.isSuccess()) {
                         System.out.println("not connected");
-                    }else {
-                        System.out.println("connected");
+                    } else {
                         channel = f.channel();  //初始化channel
-                        System.out.println("client is "+channel.toString());
                     }
                 }
             });
-
             f.sync();
             f.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             client.shutdownGracefully();
         }
 
     }
 
     class ClientChannelInitializer extends ChannelInitializer {
-
         @Override
         protected void initChannel(Channel channel) {
             channel.pipeline().addLast(new ClientFrame.ClientHandler());
         }
     }
 
-    class ClientHandler extends ChannelInboundHandlerAdapter{
+    class ClientHandler extends ChannelInboundHandlerAdapter {
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 //            super.channelRead(ctx, msg);
             ByteBuf buf = null;
-            try{
+            try {
                 buf = (ByteBuf) msg;
                /* byte[] bytes = new byte[buf.readableBytes()];
                 String receive = new String(buf.getBytes(buf.readerIndex(),bytes).array());*/
-               String receive = buf.toString(CharsetUtil.UTF_8);
-                System.out.println("client receive msg is "+receive);
-                ta.setText(ta.getText()+"\n"+ receive);
-            }finally {
+                String receive = buf.toString(CharsetUtil.UTF_8);
+                System.out.println("connn");
+                System.out.println("receive is " + receive);
+                ta.setText(ta.getText() + "\n" + receive);
+            } finally {
                 if (buf != null) {
                     ReferenceCountUtil.release(msg);
                 }
             }
         }
     }
-
 
     public TextArea getTa() {
         return ta;
